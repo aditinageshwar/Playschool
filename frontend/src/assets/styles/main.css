@@ -1,0 +1,529 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary: #1E3A8A;
+  --sidebar-bg: #0F2A44;
+  --bg-color: #F5F7FA;
+  --card-bg: #ffffff;
+  --text-main: #1F2937;
+  --text-muted: #6B7280;
+  
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --review: #FACC15;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+}
+
+/* --- Layout --- */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.dashboard-container {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+  width: 260px;
+  background-color: var(--sidebar-bg);
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-logo {
+  padding: 24px;
+  font-size: 20px;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 16px 0;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  color: #D1D5DB;
+  text-decoration: none;
+  gap: 12px;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.sidebar-item:hover, .sidebar-item.active {
+  background-color: var(--primary);
+  color: white;
+  border-left: 4px solid white;
+}
+
+/* --- Navbar --- */
+.navbar {
+  height: 70px;
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.nav-welcome {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Dashboard Header --- */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.dashboard-header h1 {
+  font-size: 24px;
+  color: var(--primary);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* --- Cards --- */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stat-title {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.stat-indicator {
+  height: 4px;
+  border-radius: 2px;
+  background: #E5E7EB;
+  overflow: hidden;
+}
+
+.indicator-fill {
+  height: 100%;
+  background: var(--primary);
+}
+
+/* --- Bottom Section (Calendar & Notices) --- */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.panel {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.panel h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  border-bottom: 1px solid #E5E7EB;
+  padding-bottom: 10px;
+}
+
+/* Notices List */
+.notice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notice-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+.badge.approved { background-color: var(--success); }
+.badge.pending { background-color: var(--warning); }
+.badge.review { background-color: var(--review); color: #854D0E; }
+.badge.management { background-color: var(--primary); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .bottom-grid { grid-template-columns: 1fr; }
+  .sidebar { position: absolute; transform: translateX(-100%); z-index: 10; height: 100%; }
+}/* --- Tables --- */
+.table-container {
+  background: white; padding: 20px; border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03); overflow-x: auto;
+}
+.table-container h3 { margin-bottom: 16px; font-size: 18px; color: var(--text-main); }
+.data-table { width: 100%; border-collapse: collapse; text-align: left; }
+.data-table th, .data-table td { padding: 12px 16px; border-bottom: 1px solid #E5E7EB; }
+.data-table th { background-color: #F9FAFB; color: var(--text-muted); font-weight: 600; font-size: 14px; }
+.data-table tbody tr:hover { background-color: #F9FAFB; }
+.action-btn { background: none; border: none; color: var(--primary); cursor: pointer; font-weight: 500; margin-right: 10px; }
+.action-btn.delete { color: var(--danger); }
+
+ 
+/* --- Login Page Styles --- */
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  /* Background image with a dark gradient overlay for better contrast */
+  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), 
+                    url('https://tse4.mm.bing.net/th/id/OIP.Hp44-FPOg7_r-jrwXIdDawHaDt?pid=Api&P=0&h=180');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.login-card {
+  /* Glassmorphism effect for a modern SaaS UI */
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 400px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255,255,255,0.3);
+  text-align: center;
+}
+
+.login-logo {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.login-card > p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #374151;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* --- Input Fields Styling --- */
+.form-control {
+  width: 100%;
+  background: #F9FAFB;
+  padding: 14px 16px;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--text-main);
+  transition: all 0.2s ease-in-out;
+  /* Soft inset shadow for depth */
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+}
+
+/* Interactive focus state */
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.15);
+  background: #ffffff;
+}
+
+/* Custom styling for the select dropdown arrow */
+select.form-control {
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  cursor: pointer;
+}
+
+/* --- Login Button Styling --- */
+
+/* --- Premium Dark Glass Auth Pages (Fixed Dropdown & Opacity) --- */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  /* Overlay ko thoda light kiya hai taaki background college clear dikhe */
+  background-image: linear-gradient(rgba(234, 235, 237, 0), rgba(227, 228, 230, 0)),
+                    url('https://tse4.mm.bing.net/th/id/OIP.Hp44-FPOg7_r-jrwXIdDawHaDt?pid=Api&P=0&h=180');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.login-card {
+  background: transparent;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  border-radius: 10%;
+}
+
+.input {
+  background: rgba(255, 255, 255, 0.9); /* 80% white taaki text clear dikhe */
+  border: 2px solid #E2E8F0;
+  border-radius: 12px;
+  color: #1E3A5F; /* Dark Navy for readability */
+  padding: 12px 16px;
+  width: 100%;
+  margin-bottom: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  border-color: #3AA4AC;
+  box-shadow: 0 0 0 4px rgba(58, 164, 172, 0.1);
+}
+
+/* Heading ko white shadow dein taaki wo colorful background par standout kare */
+.login-card h2 {
+  color: white;
+  font-weight: 800;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.2); 
+  margin-bottom: 20px;
+}
+
+.login-logo {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1E3A5F;
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+}
+
+.login-card > p {
+  color: #57a2a3; /* Thoda bright grey taaki clear dikhe */
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* --- Input Fields Styling --- */
+.form-control {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1); /* Inputs ko thoda bright kiya hai */
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  font-size: 15px;
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #3b82f6; /* Premium Blue Glow */
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+select.form-control option {
+  background-color: #0f172a; /* Dark Navy Background */
+  color: #ffffff; /* Clear White Text */
+  padding: 10px;
+}
+
+/* --- Button Styling --- */
+.login-btn {
+  width: 100%;
+  background: #df8e47;
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+
+.login-btn:hover {
+  background-color: #c67f29;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.auth-toggle-text {
+  font-size: 14px;
+  color: #cbd5e1;
+  margin-top: 20px;
+}
+
+.auth-toggle-link {
+  color: #60a5fa; /* Light blue link for better visibility */
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-toggle-link:hover {
+  text-decoration: underline;
+}
+
+/* --- Premium Registration Page Specific Styles --- */
+.register-card {
+  /* Same premium dark glass look, but wider for a full form */
+  background: rgba(15, 23, 42, 0.55);
+  padding: 40px;
+  border-radius: 16px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 600px; /* Wider than the login card */
+  text-align: center;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.form-row .form-group {
+  flex: 1; /* Makes columns equal width */
+}
+
+/* Mobile responsiveness for the 2-column form */
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
