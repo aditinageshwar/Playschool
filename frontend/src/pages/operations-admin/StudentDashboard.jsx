@@ -8,7 +8,6 @@ import starsBg from "../../images/programs/bg.png";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
-  // const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [myFees, setMyFees] = useState([]);
@@ -21,6 +20,7 @@ const StudentDashboard = () => {
         setMyFees(res.data);
       } catch (err) {
         console.error("Error loading fees");
+        setError("Error while loading fees");
       } finally {
         setLoading(false);
       }
@@ -28,54 +28,167 @@ const StudentDashboard = () => {
     fetchMyFees();
   }, []);
 
-  const totalPending = myFees
-    .filter(f => f.status === 'Pending')
-    .reduce((acc, curr) => acc + curr.amount, 0);
-
-  const handleInstantPay = async (feeId) => {
-    if (!window.confirm("Are you sure you want to proceed with the payment?")) return;
-    try {
-      await API.post(`/api/finance/pay/${feeId}`);
-      alert("Payment Successful!");
-    
-      setMyFees(prevFees => prevFees.map(fee => 
-        fee._id === feeId ? { ...fee, status: 'Paid', paymentDate: new Date() } : fee
-       )
-      );
-    } 
-    catch (err) {
-      alert("Payment failed: " + (err.response?.data?.message || "Server Error"));
-    }
+  const loadScript = (src) => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = () => {
+      resolve(false);
+    };
+    document.body.appendChild(script);
+  });
   };
 
-  // useEffect(() => {
-  //   const fetchDashboardData = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const [statsRes, assignRes] = await Promise.all([
-  //         API.get('/api/student/stats'),
-  //       ]);
+const totalPending = myFees
+  .filter(f => f.status === 'Pending')
+  .reduce((acc, curr) => acc + curr.amount, 0);
 
-  //       setStudentData(statsRes.data);
-  //     } catch (err) {
-  //       setError("Failed to load dashboard data. Please try again later.");
-  //       console.error("Dashboard Fetch Error:", err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+const handlePayAllDues = async () => {
+  if (totalPending <= 0) {
+    alert("No pending fees! 🎉");
+    return;
+  }
 
-  //   fetchDashboardData();
-  // }, []);
+  const pendingFeeIds = myFees
+      .filter(f => f.status === 'Pending')
+      .map(f => f._id);
 
-  // const stats = studentData ? [
-  //   { title: "My Attendance", value: `${studentData.attendance}%`, fill: `${studentData.attendance}%`, color: "#10b981" },
-  //   { title: "Pending Assignments", value: studentData.pendingCount, fill: "40%", color: "#f59e0b" },
-  //   { title: "Upcoming Tests", value: studentData.testCount, fill: "20%", color: "#ef4444" },
-  //   { title: "Unread Notices", value: studentData.noticeCount, fill: "60%", color: "#3b82f6" }
-  // ] : [];
+  try {
+    const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+    if (!res) return;
+      
+    const [keyRes, orderRes] = await Promise.all([
+      API.get('/api/payment/getRazorpayKey'),
+      API.post('/api/payment/create-order-all', {
+        amount: totalPending,
+        feeIds: pendingFeeIds 
+      })
+    ]);
+    const razorpayKey = keyRes.data.key;
+    const order = orderRes.data;
 
- if(loading) 
+    const options = {
+      key: razorpayKey,
+      amount: order.amount,
+      currency: order.currency,
+      name: "PlaySchool",
+      image: "",
+      description: "All Pending School Fees",
+      order_id: order.id,
+      handler: async function (response) {
+          try {
+              const verifyRes = await API.post('/api/payment/verify-payment-all', {
+                ...response,
+                feeIds: pendingFeeIds
+              });
+
+              if (verifyRes.data.success) {
+                alert("All dues paid! ✨");
+                setMyFees(prev => prev.map(f => 
+                  f.status === 'Pending' ? { ...f, status: 'Paid', paymentDate: new Date() } : f
+                ));
+              }
+          } catch (err) {
+              alert("Verification Failed!");
+          }
+      },
+      prefill: {
+        name: localStorage.getItem('userName'),
+        email: localStorage.getItem('userEmail'),
+      },
+      theme: { 
+        color: "#3AA4AC"
+      },
+      method: 
+      {
+        card: true,
+        netbanking: true,
+        upi: true,
+        wallet: true,
+      }
+    };
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  } 
+  catch (err) {
+    console.error("Pay All error:", err);
+    alert("Payment initialization failed.");
+  }
+};
+
+const handleRazorpayPayment = async (fee) => {
+  const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+
+  if (!res) {
+    alert("Razorpay SDK failed to load. Please check your internet connection.");
+    return;
+  }
+  try {
+    const [keyRes, orderRes] = await Promise.all([
+      API.get('/api/payment/getRazorpayKey'),
+      API.post('/api/payment/create-order', {
+        amount: fee.amount,
+        feeId: fee._id
+      })
+    ]);
+    const razorpayKey = keyRes.data.key;
+    const order = orderRes.data;
+
+    const options = {
+      key: razorpayKey, 
+      amount: order.amount,
+      currency: order.currency,
+      name: "PlaySchool",
+      image: "",
+      description: `Student Fee Payment - ${new Date(fee.dueDate).toLocaleDateString()}`,
+      order_id: order.id,
+      handler: async function (response) {
+        try {
+          const verifyRes = await API.post('/api/payment/verify-payment', {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            feeId: fee._id
+          });
+
+          if (verifyRes.data.success) {
+            alert("Payment Successful ✨");
+            setMyFees(prev => prev.map(f => 
+              f._id === fee._id ? { ...f, status: 'Paid', paymentDate: new Date() } : f
+            ));
+          }
+        } catch (err) {
+          alert("Verification Failed!");
+        }
+      },
+      prefill: {
+        name: localStorage.getItem('userName'),
+        email: localStorage.getItem('userEmail'),
+      },
+      theme: {
+        color: "#3AA4AC", 
+      },
+      method: 
+      {
+        card: true,
+        netbanking: true,
+        upi: true,
+        wallet: true,
+      }
+    };
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+
+  } catch (err) {
+    console.error("Error initiating payment", err);
+    alert("Payment initialization failed.");
+  }
+};
+
+if(loading) 
   return <div className="loading-spinner">Loading your portal...</div>;
 
   return (
@@ -121,7 +234,9 @@ const StudentDashboard = () => {
                   <h3 className="text-3xl font-black text-[#1E3A5F]">₹{totalPending.toLocaleString('en-IN')}</h3>
                   <p className="text-slate-400 text-sm font-medium">Total Pending Dues</p>
                 </div>
-                <button className="bg-[#1E3A5F] text-white px-10 py-4 rounded-2xl font-black text-sm hover:bg-[#2d4d75] transition-all shadow-lg flex items-center gap-2">
+                <button 
+                  onClick={handlePayAllDues}
+                  className="bg-[#1E3A5F] text-white px-10 py-4 rounded-2xl font-black text-sm hover:bg-[#2d4d75] transition-all shadow-lg flex items-center gap-2">
                   <FiCreditCard /> Pay All Dues
                 </button>
               </div>
@@ -150,7 +265,7 @@ const StudentDashboard = () => {
                           <FiCalendar /> DUE: {new Date(fee.dueDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short'})}
                         </div>
                         <button 
-                          onClick={() => handleInstantPay(fee._id)} 
+                          onClick={() => handleRazorpayPayment(fee)} 
                           className="bg-[#3AA4AC] text-white px-6 py-2 rounded-xl font-black text-xs hover:bg-[#2d8389] transition-all shadow-sm active:scale-95"
                         >
                           PAY NOW
@@ -163,7 +278,7 @@ const StudentDashboard = () => {
                     <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-[#3AA4AC] shadow-inner">
                       <FiCheckCircle size={40} />
                     </div>
-                    <p className="text-[#07758D] font-black text-2xl italic">All Settled! 🎉</p>
+                    <p className="text-[#07758D] font-black text-2xl">All Settled! 🎉</p>
                     <p className="text-[#3AA4AC] font-medium mt-1">You have no pending dues. Keep up the great work!</p>
                   </div>
                 )}

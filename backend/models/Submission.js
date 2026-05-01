@@ -13,7 +13,6 @@ const submissionSchema = new mongoose.Schema({
   },
   answer: {
     type: String,
-    required: true
   },
   fileUrl: {
     type: String,

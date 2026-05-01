@@ -53,23 +53,6 @@ exports.getMyFees = async (req, res) => {
   }
 };
 
-exports.payFee = async (req, res) => {
-  try {
-    const { feeId } = req.params;
-    const fee = await Fee.findByIdAndUpdate(feeId,
-      {
-        status: "Paid",
-        paymentDate: new Date()
-      },
-      { new: true }
-    );
-
-    res.json({ message: "Fee paid", fee });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 exports.updateFee = async (req, res) => {
   try {
     const { feeId } = req.params;

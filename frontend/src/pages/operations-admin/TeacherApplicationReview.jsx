@@ -110,7 +110,7 @@ const TeacherApplicationReview = () => {
                         <FiInfo size={12}/> Request Type: {app.type}
                       </p>
 
-                      <h3 className="font-bold text-lg text-[#1E3A5F] mb-2">{app.subject}</h3>
+                      <h3 className="font-bold text-lg text-[#1E3A5F] mb-2">Subject : {app.subject}</h3>
                       <div className="bg-[#F8FAFC]/80 p-5 rounded-[25px] border border-slate-100 text-[#1E3A5F] text-sm leading-relaxed italic shadow-inner">
                         "{app.description}"
                       </div>

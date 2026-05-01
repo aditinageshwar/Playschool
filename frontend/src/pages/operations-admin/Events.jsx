@@ -8,6 +8,7 @@ const Events = () => {
   const [events, setEvents] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({title: "", description: "", date: "", location: ""});
+  const today = new Date().toISOString().split('T')[0];
 
   const fetchEvents = async () => {
     try {
@@ -95,6 +96,7 @@ const Events = () => {
                 value={form.date}
                 onChange={(e) => setForm({ ...form, date: e.target.value })}
                 required
+                min={today}
               />
             </div>
 

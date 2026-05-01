@@ -17,6 +17,7 @@ const FinanceAdminDashboard = () => {
   const [students, setStudents] = useState([]); 
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [filters, setFilters] = useState({ className: '', section: '' });
+  const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -382,6 +383,7 @@ const FinanceAdminDashboard = () => {
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AA4AC] outline-none"
                       value={formData.dueDate} 
                       onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
+                      min={today}
                     />
                   </div>
                 </div>

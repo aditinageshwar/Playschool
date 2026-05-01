@@ -100,7 +100,7 @@ const StudentAssignments = () => {
                                     <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 text-[#3AA4AC] shadow-md">
                                         <FiCheckCircle size={50} />
                                     </div>
-                                    <p className="text-[#1E3A5F] text-2xl font-black italic">Excellent Job!</p>
+                                    <p className="text-[#1E3A5F] text-2xl font-black">Excellent Job!</p>
                                     <p className="text-[#3AA4AC] font-bold mt-2">All your assignments are submitted. Go play! 🎈</p>
                                 </div>
                             )}
@@ -119,7 +119,7 @@ const StudentAssignments = () => {
                                     <span className="bg-[#FCEAE2] text-[#F07A4A] text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest border border-orange-50"> 
                                         New Submission 
                                     </span>
-                                    <h3 className="text-3xl font-black text-[#1E3A5F] mt-4 leading-tight"> {selectedAsg.title} </h3>
+                                    <h3 className="text-2xl font-black text-[#1E3A5F] mt-4 leading-tight"> {selectedAsg.title} </h3>
                                     
                                     <div className="bg-[#F8FAFC] border border-slate-100 rounded-[30px] p-6 mt-6">
                                         <p className="text-[10px] font-black uppercase text-[#3AA4AC] mb-2 tracking-widest">Educator's Note</p>
@@ -131,7 +131,6 @@ const StudentAssignments = () => {
                                     <div>
                                         <label className="text-[10px] font-black uppercase text-slate-400 ml-3 mb-2 block">Your Magic Answer</label>
                                         <textarea 
-                                            required
                                             className="w-full p-6 bg-[#F8FAFC] border border-slate-100 rounded-[30px] h-40 focus:ring-4 ring-[#3AA4AC]/10 outline-none font-medium text-[#1E3A5F]"
                                             placeholder="Write your answer or notes here..."
                                             value={formData.answer}

@@ -21,6 +21,12 @@ const feeSchema = new mongoose.Schema({
   },
   paymentDate: {
     type: Date
+  },
+  orderId: {
+    type: String,
+  },
+  paymentId: {
+    type: String, 
   }
 }, { timestamps: true });
 

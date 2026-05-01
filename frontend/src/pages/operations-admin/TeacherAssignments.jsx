@@ -14,6 +14,7 @@ const TeacherAssignments = () => {
     const [currentSubmissions, setCurrentSubmissions] = useState([]);
     
     const [form, setForm] = useState({title: "", className: "", section: "", dueDate: "", instructions: ""});
+    const today = new Date().toISOString().split('T')[0];
 
     useEffect(() => {
         fetchAssignments();
@@ -194,7 +195,7 @@ const TeacherAssignments = () => {
 
                                     <div className="relative">
                                         <FiCalendar className="absolute left-5 top-1/2 -translate-y-1/2 text-[#3AA4AC]" />
-                                        <input type="date" name="dueDate" required value={form.dueDate} onChange={handleChange} 
+                                        <input type="date" name="dueDate" required value={form.dueDate} onChange={handleChange} min={today} 
                                             className="w-full p-3 pl-14 bg-[#F8FAFC] border border-slate-300 rounded-[15px] focus:ring-4 ring-[#3AA4AC]/10 font-bold outline-none" />
                                     </div>
 

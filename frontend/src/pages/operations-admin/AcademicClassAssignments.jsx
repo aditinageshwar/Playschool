@@ -187,7 +187,7 @@ const ClassAssignmentsManagement = () => {
                     {classes.length > 0 ? classes.map((cls) => (
                       <tr key={cls._id} className="hover:bg-teal-50/30 transition-colors group">
                         <td className="p-6">
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-6">
                             <div className="w-12 h-12 bg-orange-50 text-[#F07A4A] rounded-2xl flex items-center justify-center font-black text-lg">
                               {cls.className}
                             </div>
