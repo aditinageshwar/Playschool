@@ -9,7 +9,7 @@ const isLocalhost = Boolean(
 const API = axios.create({
   baseURL: isLocalhost 
     ? 'http://localhost:5000' 
-    : '',
+    : 'https://playschool-backend-rgpa.onrender.com',
 });
 
 API.interceptors.request.use((req) => {

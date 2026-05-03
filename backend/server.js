@@ -7,7 +7,7 @@ dotenv.config();
 const app = express();
 console.log("✅ Event routes loaded...");
 app.use(cors({
-  origin: ["http://localhost:3000"], 
+  origin: ["https://playschool-frontend.onrender.com", "http://localhost:3000"], 
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"]
