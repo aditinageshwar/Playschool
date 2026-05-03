@@ -281,7 +281,7 @@ body {
   height: 100vh;
   /* Background image with a dark gradient overlay for better contrast */
   background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), 
-                    url('https://tse4.mm.bing.net/th/id/OIP.Hp44-FPOg7_r-jrwXIdDawHaDt?pid=Api&P=0&h=180');
+                    url('../../images/login.jpeg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -368,7 +368,7 @@ select.form-control {
   height: 100vh;
   /* Overlay ko thoda light kiya hai taaki background college clear dikhe */
   background-image: linear-gradient(rgba(234, 235, 237, 0), rgba(227, 228, 230, 0)),
-                    url('https://tse4.mm.bing.net/th/id/OIP.Hp44-FPOg7_r-jrwXIdDawHaDt?pid=Api&P=0&h=180');
+                    url('../../images/login.jpeg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
