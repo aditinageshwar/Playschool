@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import Sidebar from '../../components/Sidebar';
 import Navbar from '../../components/Navbar';
-import { FiDollarSign, FiX, FiFileText, FiEdit3, FiTrash2, FiSearch, FiTrendingUp } from 'react-icons/fi';
+import { FiDollarSign, FiX, FiFileText, FiEdit3, FiTrash2, FiSearch, FiTrendingUp, FiBell } from 'react-icons/fi';
 import API from "../../api/axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -13,6 +13,7 @@ const FinanceAdminDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({studentId: '', amount: '', dueDate: '', status: 'Pending'});
   const [editingId, setEditingId] = useState(null);
+  const [notificationLoading, setnotificationLoading] = useState(false);
 
   const [students, setStudents] = useState([]); 
   const [filteredStudents, setFilteredStudents] = useState([]);
@@ -96,6 +97,22 @@ const FinanceAdminDashboard = () => {
   setShowModal(true);
 };
 
+ const handleSendReminders = async () => {
+    if (!window.confirm("Are you sure you want to send email reminders to all students with pending fees?")) 
+      return;
+
+    setnotificationLoading(true);
+    try {
+      const response = await API.post('/api/payment/send-due-reminders');
+      alert(response.data.message); 
+    } catch (err) {
+      console.error(err);
+      alert("Error: Could not send reminders at this time.");
+    } finally {
+      setnotificationLoading(false);
+    }
+};
+
   //--Generate Invoice-----
   const generateInvoice = (tx) => {
   const doc = new jsPDF();
@@ -124,8 +141,10 @@ const FinanceAdminDashboard = () => {
   doc.text("STUDENT DETAILS:", 20, 68);
   doc.setFont(undefined, 'normal');
   doc.text(`Name: ${tx.studentId?.user?.name || "N/A"}`, 20, 75);
-  doc.text(`Roll Number: ${tx.studentId?.rollNumber || "N/A"}`, 20, 82);
-  doc.text(`Payment Mode: Online`, 145, 75);
+  doc.text(`Email: ${tx.studentId?.user?.email || "N/A"}`, 20, 82);
+  doc.text(`Phone: ${tx.studentId?.user?.phone || "N/A"}`, 20, 89);
+  doc.text(`Roll Number: ${tx.studentId?.rollNumber || "N/A"}`, 140, 75);
+  doc.text(`Payment Mode: Online`, 140, 82);
 
   // 4. Table of Charges
   autoTable(doc, {
@@ -236,9 +255,29 @@ const FinanceAdminDashboard = () => {
           </div>
 
           <div className="bg-white rounded-[40px] shadow-xl overflow-hidden border border-slate-50">
-               <div className="p-8 border-b border-slate-50 bg-[#F8FAFC]/50 flex justify-between items-center">
-                 <h3 className="text-xl font-bold text-[#1E3A5F] flex items-center gap-2"><FiTrendingUp className="text-[#3AA4AC]"/> Recent Transactions</h3>
-               </div>
+            <div className="flex items-center justify-between">
+              <div className="p-8 border-b border-slate-50 bg-[#F8FAFC]/50 flex justify-between items-center">
+                <h3 className="text-xl font-bold text-[#1E3A5F] flex items-center gap-2"><FiTrendingUp className="text-[#3AA4AC]"/> Recent Transactions</h3>
+              </div>
+
+              <button 
+                onClick={handleSendReminders}
+                disabled={notificationLoading }
+                className={`flex items-center gap-2 px-2 mr-4 py-2 rounded-xl font-bold transition-all shadow-sm border-2 
+                ${notificationLoading 
+                  ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                  : 'border-red-200 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500'
+                }`}
+              >
+                {notificationLoading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+                ) : (
+                  <FiBell className="text-lg" />
+                )}
+                {notificationLoading ? 'Sending...' : 'Send Reminders'}
+              </button>
+             </div>
+
                <div className="overflow-x-auto">
                  <table className="w-full text-left">
                    <thead>
@@ -257,6 +296,8 @@ const FinanceAdminDashboard = () => {
                          <td className="p-6 font-bold text-slate-400">#{tx._id.slice(-8)}</td>
                          <td className="p-6">
                            <p className="font-bold text-[#1E3A5F]">{tx.studentId?.user?.name}</p>
+                           <p className="text-xs text-slate-400">Email: {tx.studentId?.user?.email}</p>
+                           <p className="text-xs text-slate-400">Phone No: {tx.studentId?.user?.phone}</p>
                            <p className="text-xs text-slate-400">Roll: {tx.studentId?.rollNumber}</p>
                          </td>
                          <td className="p-6 font-black text-[#1E3A5F]">₹{tx.amount}</td>

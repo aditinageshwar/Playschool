@@ -1,5 +1,7 @@
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+
+const { sendDueReminderEmail } = require('../Mail');
 const Fee = require('../models/Fee');
 require('dotenv').config();
 const express = require("express");
@@ -119,6 +121,43 @@ router.post('/verify-payment-all', async (req, res) => {
     } catch (error) {
         console.error("Verification All Error:", error);
         res.status(500).json({ message: "Server Error" });
+    }
+});
+
+router.post('/send-due-reminders', async (req, res) => {
+    try {
+        const pendingFees = await Fee.find({ status: 'Pending' })
+            .populate({
+                path: "studentId",
+                populate: {
+                    path: "user",
+                    select: "name email" 
+                }
+            });
+
+        if (pendingFees.length === 0) {
+          return res.status(200).json({ message: "No pending fees found." });
+        }
+
+        // Send emails to all students in the list
+        const emailPromises = pendingFees.map(fee => {
+          const studentEmail = fee.studentId?.user?.email;
+          const studentName = fee.studentId?.user?.name;
+
+          if (studentEmail) {
+            return sendDueReminderEmail(studentEmail, studentName, {
+                amount: fee.amount,
+                dueDate: fee.dueDate,
+            });
+          }
+        });
+        await Promise.all(emailPromises);
+
+        res.status(200).json({ success: true, message: `${pendingFees.length} Reminders sent successfully!` });
+    } 
+    catch (error) {
+      console.error("Reminder Error:", error);
+      res.status(500).json({ message: "Failed to send reminders." });
     }
 });
 

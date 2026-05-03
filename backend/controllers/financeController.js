@@ -26,7 +26,7 @@ exports.getAllFees = async (req, res) => {
         select: "rollNumber", 
         populate: {
           path: "user", 
-          select: "name"
+          select: "name phone email"
         }
       });
     res.json(fees);
