@@ -79,14 +79,14 @@ const StudentAdminDashboard = () => {
       const data = response.data.data;
       const totalStudents = data.totalStudents || 0;
       const newAdmissions = data.newAdmissions || 0;
-      const unresolvedAdmissions = data.unresolvedAdmissions || 0;
+      const totalLeft = data.totalLeft || 0;
       const unallocatedStudents = data.unallocatedStudents || 0;
 
       // Calculate fill percentages (max 100%)
       const maxStudents = Math.max(totalStudents, 100); // Use at least 100 as baseline
       const totalFill = Math.min((totalStudents / maxStudents) * 100, 100);
       const admissionsFill = Math.min((newAdmissions / Math.max(totalStudents, 1)) * 100, 100);
-      const unresolvedFill = Math.min((unresolvedAdmissions / Math.max(totalStudents, 1)) * 100, 100);
+      const unresolvedFill = Math.min((totalLeft / Math.max(totalStudents, 1)) * 100, 100);
       const unallocatedFill = Math.min((unallocatedStudents / Math.max(totalStudents, 1)) * 100, 100);
 
       setStats([
@@ -103,8 +103,8 @@ const StudentAdminDashboard = () => {
           color: "var(--success)"
         },
         {
-          title: "Unresolved Admissions",
-          value: unresolvedAdmissions.toLocaleString(),
+          title: "Exited Students",
+          value: totalLeft.toLocaleString(),
           fill: `${unresolvedFill}%`,
           color: "var(--warning)"
         },

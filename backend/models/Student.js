@@ -11,6 +11,11 @@ const studentSchema = new mongoose.Schema({
   rollNumber: { type: String, required: true, unique: true },
   address: { type: String },
   dob: { type: Date, required: true },
+  status: {
+    type: String,
+    enum: ["Active", "Left"],
+    default: "Active"
+  },
 
   // for Student Admin perspective
   allocationDate: { type: Date },

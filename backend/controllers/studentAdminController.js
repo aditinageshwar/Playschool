@@ -250,7 +250,9 @@ exports.deleteStudent = async (req, res) => {
 
     // Delete from User collection as well
     await User.findByIdAndDelete(student.user);
-    await Student.findByIdAndDelete(studentId);
+    student.status = "Left";
+    await student.save();
+    // await Student.findByIdAndDelete(studentId);
 
     res.status(200).json({
       message: "Student deleted successfully",
@@ -511,7 +513,7 @@ exports.getAllClassNames = async (req, res) => {
 // Get student admin dashboard stats
 exports.getDashboardStats = async (req, res) => {
   try {
-    const totalStudents = await Student.countDocuments();
+    const totalStudents = await Student.countDocuments({ status: "Active" });
 
     const today = new Date();
     const currentYear = today.getFullYear();
@@ -523,14 +525,12 @@ exports.getDashboardStats = async (req, res) => {
       sessionStartDate = new Date(currentYear, 5, 1);
     }
     const newAdmissions = await Student.countDocuments({
+      status: "Active",
       createdAt: { $gte: sessionStartDate }
     });
     
-    const unresolvedAdmissions = await Application.countDocuments({
-      status: { $in: ["Pending", "Processing"] },
-    });
+    const totalLeft = await Student.countDocuments({ status: "Left" });
 
-    // Count students without proper class allocation
     const unallocatedStudents = await Student.countDocuments({
       $or: [{ className: null }, { className: "" }],
     });
@@ -540,7 +540,7 @@ exports.getDashboardStats = async (req, res) => {
       data: {
         totalStudents,
         newAdmissions,
-        unresolvedAdmissions,
+        totalLeft,
         unallocatedStudents,
       },
     });

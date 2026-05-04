@@ -200,8 +200,7 @@ return (
             <div className="p-10">
               <div className="flex justify-between items-start mb-8">
                 <div>
-                  <h3 className="text-2xl font-black text-[#1E3A5F] italic">Edit Profile</h3>
-                  <p className="text-xs text-[#3AA4AC] font-bold mt-1 uppercase tracking-widest">ID: {editingStudent?._id}</p>
+                  <h3 className="text-2xl font-black text-[#1E3A5F]">Edit Profile</h3>
                 </div>
                 <button onClick={() => setShowModal(false)} className="text-slate-300 hover:text-[#F07A4A] transition-colors"><FiX size={28}/></button>
               </div>
@@ -257,11 +256,11 @@ return (
                   </div>
                 </div>
 
-                <div className="flex gap-4 pt-4">
-                  <button type="submit" disabled={loading} className="flex-1 bg-[#3AA4AC] text-white py-4 rounded-2xl font-black text-lg hover:bg-[#2d8389] transition-all shadow-lg shadow-teal-50">
+                <div className="flex gap-4 pt-2">
+                  <button type="submit" disabled={loading} className="flex-1 bg-[#3AA4AC] text-white py-3 rounded-2xl font-black text-lg hover:bg-[#2d8389] transition-all shadow-lg shadow-teal-50">
                     {loading ? "Saving..." : "Save Profile"}
                   </button>
-                  <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-slate-100 text-slate-500 py-4 rounded-2xl font-black text-lg hover:bg-slate-200 transition-all">
+                  <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-slate-100 text-slate-500 py-3 rounded-2xl font-black text-lg hover:bg-slate-200 transition-all">
                     Cancel
                   </button>
                 </div>
