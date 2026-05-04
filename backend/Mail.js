@@ -1,5 +1,8 @@
 const nodemailer = require('nodemailer');
+const dns = require('dns');
 require('dotenv').config();
+
+dns.setDefaultResultOrder('ipv4first');
 
 const sendDueReminderEmail = async (studentEmail, studentName, paymentDetails) => {
     // let testAccount = await nodemailer.createTestAccount();
@@ -10,6 +13,9 @@ const sendDueReminderEmail = async (studentEmail, studentName, paymentDetails) =
         auth: {
             user: process.env.EMAIL_USER, 
             pass: process.env.EMAIL_PASS  
+        },
+        lookup: (hostname, options, callback) => {
+           return dns.lookup(hostname, { family: 4 }, callback);
         },
         connectionTimeout: 10000, 
         greetingTimeout: 10000
