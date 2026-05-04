@@ -1,6 +1,8 @@
 const Application = require("../models/Application");
 const Student = require("../models/Student");
 const User = require("../models/User");
+const Class = require("../models/Class");
+const Teacher = require("../models/Teacher");
 
 exports.sendApplication = async (req, res) => {
   try {
@@ -30,14 +32,34 @@ exports.sendApplication = async (req, res) => {
 
 exports.getAllApplications = async (req, res) => {
   try {
+    const userId = req.user.id; 
+    const teacherProfile = await Teacher.findOne({ user: userId });
+    if (!teacherProfile) {
+      return res.status(404).json({ message: "Teacher profile not found." });
+    }
+
+    const assignedClasses = await Class.find({ 
+      classTeacher: teacherProfile._id,
+      status: "active" 
+    });
+    if (!assignedClasses || assignedClasses.length === 0) {
+      return res.status(403).json({ message: "Access Denied: No class assigned to you." });
+    }
+    const classPairs = assignedClasses.map(c => ({
+      className: c.className,
+      section: c.section
+    }));
+    
     const applications = await Application.find()
       .populate({
         path: 'student',
+        match: { $or: classPairs },
         populate: { path: 'user', select: 'name' }
       })
       .sort({ appliedDate: -1 });
-
-    res.status(200).json(applications);
+    
+    const filteredApplications = applications.filter(app => app.student !== null);
+    res.status(200).json(filteredApplications);
   } 
   catch (error) {
     res.status(500).json({ message: error.message });

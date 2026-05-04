@@ -31,6 +31,12 @@ const TeacherAttendanceMark = () => {
             setAttendanceList(initialStatus);
         } catch (err) {
             console.error(err);
+            setStudents([]);
+            if (err.response && err.response.status === 403) {
+              alert(err.response?.data?.message);
+            } else {
+              alert("Error fetching students list");
+            }
         } finally {
             setLoading(false);
         }

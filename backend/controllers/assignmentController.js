@@ -1,12 +1,14 @@
 const Assignment = require("../models/Assignment");
 const User = require("../models/User");
+const Teacher = require("../models/Teacher");
 const Student = require("../models/Student");
 const Submission = require("../models/Submission");
 
 exports.createAssignment = async (req, res) => {
    try {
         const { title, className, section, dueDate, instructions, userEmail } = req.body;
-        const teacher = await User.findOne({ email: userEmail });
+        const user = await User.findOne({ email: userEmail });
+        const teacher = await Teacher.findOne({ user: user._id });
         if (!teacher) return res.status(404).json({ message: "Teacher not found" });
         
         const newAssignment = new Assignment({
@@ -38,7 +40,6 @@ exports.getAssignments = async (req, res) => {
       if (!student) {
         return res.status(404).json({ message: "Student profile not found" });
       }
-
       filter = { 
         className: student.className, 
         section: student.section 
@@ -46,7 +47,13 @@ exports.getAssignments = async (req, res) => {
     }
     else if (role === "teacher")
     {
-      filter = { teacher: user._id };
+      const teacher = await Teacher.findOne({ user: user._id });
+      if (!teacher) {
+        return res.status(404).json({ message: "Teacher profile not found" });
+      }
+      filter = { 
+        teacher: teacher._id
+      };
     }  
     const assignments = await Assignment.find(filter).sort({ createdAt: 1 });
     res.json(assignments);

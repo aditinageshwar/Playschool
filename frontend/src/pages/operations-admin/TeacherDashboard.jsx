@@ -1,17 +1,78 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
 import Navbar from '../../components/Navbar';
 import { FiEdit3, FiUsers, FiClipboard, FiCheckCircle, FiClock, FiCalendar } from 'react-icons/fi';
 import starsBg from "../../images/programs/bg.png";
+import API from '../../api/axios';
 
 const TeacherDashboard = () => {
-  const stats = [
-    { title: "Classes Today", value: "5", icon: <FiClock />, fill: "80%", color: "var(--primary)" },
-    { title: "Assignments to Grade", value: "24", icon: <FiEdit3 />, fill: "40%", color: "var(--warning)" },
-    { title: "Average Attendance", value: "92%", icon: <FiCheckCircle />, fill: "92%", color: "var(--success)" },
-    { title: "Pending Applications", value: "3", icon: <FiClipboard />, fill: "15%", color: "var(--danger)" }
-  ];
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState([
+    { title: "Classes Today", value: "0", icon: <FiClock />, fill: "0%", color: "var(--primary)" },
+    { title: "Active Assignments", value: "0", icon: <FiEdit3 />, fill: "0%", color: "var(--warning)" },
+    { title: "Average Attendance", value: "0", icon: <FiCheckCircle />, fill: "0%", color: "var(--success)" },
+    { title: "Pending Applications", value: "0", icon: <FiClipboard />, fill: "0%", color: "var(--danger)" }
+  ]);
+  
+  useEffect(() => {
+    fetchDashboardStats();
+  }, []);
 
+  const fetchDashboardStats = async () => {
+    try {
+      setLoading(true);
+      const res = await API.get('/api/teacher/dashboard-stats');
+      const data = res.data;
+
+      const classesToday = data.classesToday || 0;
+      const activeAssignment = data.activeAssignment || 0;
+      const averageAttendance = data.averageAttendance || 0;
+      const presentRecords = data.presentRecords || 0;
+      const pendingApplication = data.pendingApplication || 0;
+
+      // Calculate fill percentages (max 100%)
+      const classesFill = Math.min((classesToday / 6) * 100, 100);
+      const assignmentFill = Math.min((activeAssignment / 10) * 100, 100);
+      const attendanceFill = Math.min(averageAttendance, 100);
+      const applicationFill = Math.min((pendingApplication / 10) * 100, 100);
+      
+      setStats([
+        {
+          title: "Classes Today",
+          value: classesToday.toLocaleString(),
+          icon: <FiClock />,
+          fill: `${classesFill}%`,
+          color: "var(--primary)"
+        },
+        {
+          title: "Active Assignments",
+          value: activeAssignment.toLocaleString(),
+          icon: <FiEdit3 />,
+          fill: `${assignmentFill}%`,
+          color: "var(--warning)"
+        },
+        {
+          title: "Average Attendance",
+          value: presentRecords.toLocaleString(),
+          icon: <FiCheckCircle />,
+          fill: `${attendanceFill}%`,
+          color: "var(--success)"
+        },
+        {
+          title: "Pending Applications",
+          value: pendingApplication.toLocaleString(),
+          icon: <FiClipboard />,
+          fill: `${applicationFill}%`,
+          color: "var(--danger)" 
+        }
+      ]);
+  } catch (err) {
+      console.error("Error loading stats", err);
+  } finally {
+      setLoading(false);
+  }
+  };
+  
   return (
     <div className="flex min-h-screen bg-[#FEF7E6]">
       <Sidebar />

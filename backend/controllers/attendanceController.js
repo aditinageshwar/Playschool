@@ -1,10 +1,26 @@
 const Attendance = require("../models/Attendance");
 const User = require('../models/User');
 const Student = require('../models/Student');
+const Class = require('../models/Class');
+const Teacher = require('../models/Teacher');
 
 exports.getStudentsForAttendance = async (req, res) => {
    try {
         const { className, section } = req.query;
+        const userId = req.user.id; 
+        const teacherProfile = await Teacher.findOne({ user: userId });
+
+        const isAssigned = await Class.findOne({ 
+            className, 
+            section, 
+            classTeacher: teacherProfile._id
+        });
+
+        if (!isAssigned) {
+            return res.status(403).json({ 
+                message: "Access Denied: You are not assigned as the class teacher for this section." 
+            });
+        }
         const students = await Student.find({ className, section })
             .populate('user', 'name'); 
       
