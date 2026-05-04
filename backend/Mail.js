@@ -5,11 +5,15 @@ const sendDueReminderEmail = async (studentEmail, studentName, paymentDetails) =
     // let testAccount = await nodemailer.createTestAccount();
     const transporter = nodemailer.createTransport({
         service: 'gmail',
-        port: 465,
-        secure: true, 
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false, 
         auth: {
             user: process.env.EMAIL_USER, 
             pass: process.env.EMAIL_PASS  
+        },
+        tls: {
+            rejectUnauthorized: false // solve timeout and certificate issues
         }
 
         // host: "smtp.ethereal.email",
