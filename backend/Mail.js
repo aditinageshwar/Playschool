@@ -1,24 +1,17 @@
 const nodemailer = require('nodemailer');
-const dns = require('dns');
 require('dotenv').config();
-
-dns.setDefaultResultOrder('ipv4first');
 
 const sendDueReminderEmail = async (studentEmail, studentName, paymentDetails) => {
     // let testAccount = await nodemailer.createTestAccount();
     const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true, 
+        host: 'smtp-relay.brevo.com',
+        port: 587,
+        secure: false,
         auth: {
             user: process.env.EMAIL_USER, 
             pass: process.env.EMAIL_PASS  
         },
-        lookup: (hostname, options, callback) => {
-           return dns.lookup(hostname, { family: 4 }, callback);
-        },
-        connectionTimeout: 10000, 
-        greetingTimeout: 10000
+    
 
         // host: "smtp.ethereal.email",
         // port: 587,
@@ -30,7 +23,7 @@ const sendDueReminderEmail = async (studentEmail, studentName, paymentDetails) =
     });
 
     const mailOptions = {
-    from: `"PlaySchool Support" <${process.env.EMAIL_USER}>`,
+    from: `"PlaySchool Support" <${process.env.MYEMAIL}>`,
     to: studentEmail,
     subject: 'URGENT: Fee Payment Reminder', 
     html: `
