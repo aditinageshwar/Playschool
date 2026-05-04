@@ -4,7 +4,6 @@ require('dotenv').config();
 const sendDueReminderEmail = async (studentEmail, studentName, paymentDetails) => {
     // let testAccount = await nodemailer.createTestAccount();
     const transporter = nodemailer.createTransport({
-        service: 'gmail',
         host: 'smtp.gmail.com',
         port: 587,
         secure: false, 
@@ -13,8 +12,10 @@ const sendDueReminderEmail = async (studentEmail, studentName, paymentDetails) =
             pass: process.env.EMAIL_PASS  
         },
         tls: {
-            rejectUnauthorized: false // solve timeout and certificate issues
-        }
+            rejectUnauthorized: false, // solve timeout and certificate issues
+            servername: 'smtp.gmail.com'
+        },
+        family: 4
 
         // host: "smtp.ethereal.email",
         // port: 587,
