@@ -512,9 +512,20 @@ exports.getAllClassNames = async (req, res) => {
 exports.getDashboardStats = async (req, res) => {
   try {
     const totalStudents = await Student.countDocuments();
-    const pendingAdmissions = await Application.countDocuments({
-      status: "Pending",
+
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    let sessionStartDate;
+
+    if (today.getMonth() < 5) { 
+      sessionStartDate = new Date(currentYear - 1, 5, 1);
+    } else {
+      sessionStartDate = new Date(currentYear, 5, 1);
+    }
+    const newAdmissions = await Student.countDocuments({
+      createdAt: { $gte: sessionStartDate }
     });
+    
     const unresolvedAdmissions = await Application.countDocuments({
       status: { $in: ["Pending", "Processing"] },
     });
@@ -528,7 +539,7 @@ exports.getDashboardStats = async (req, res) => {
       message: "Dashboard stats retrieved successfully",
       data: {
         totalStudents,
-        pendingAdmissions,
+        newAdmissions,
         unresolvedAdmissions,
         unallocatedStudents,
       },

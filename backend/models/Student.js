@@ -24,6 +24,6 @@ const studentSchema = new mongoose.Schema({
       promotedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
     }
   ],
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model("Student", studentSchema);
