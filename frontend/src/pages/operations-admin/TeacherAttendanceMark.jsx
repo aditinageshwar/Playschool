@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
 import Navbar from '../../components/Navbar';
 import API from '../../api/axios';
-import { FiSave, FiSearch, FiCheck, FiX, FiLoader, FiCalendar, FiUsers, FiStar } from 'react-icons/fi';
+import { FiSave, FiSearch, FiCheck, FiX, FiLoader, FiCalendar, FiUsers, FiStar, FiAlertTriangle } from 'react-icons/fi';
 import starsBg from "../../images/programs/bg.png";
 
 const TeacherAttendanceMark = () => {
@@ -96,8 +96,18 @@ const TeacherAttendanceMark = () => {
                         </div>
                     </div>
 
+                    {(!filters.className || !filters.section) && !loading && (
+                    <div className="text-center py-20 bg-white/40 backdrop-blur-sm rounded-[50px] border-4 border-dashed border-[#E6F4F5]">
+                        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 text-[#F07A4A] shadow-md">
+                        <FiUsers size={50} />
+                        </div>
+                        <p className="text-[#1E3A5F] text-2xl font-black">Ready to start?</p>
+                        <p className="text-[#3AA4AC] font-bold mt-2">Pick a class and section to see your magical learners! 🌈</p>
+                    </div>
+                    )}
+
                     {/* Students Table */}
-                    {students.length > 0 ? (
+                    {filters.className && filters.section && students.length > 0 ? (
                         <div className="bg-white/90 backdrop-blur-sm rounded-[40px] shadow-2xl border border-white/50 overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left">
@@ -151,14 +161,15 @@ const TeacherAttendanceMark = () => {
                                 </button>
                             </div>
                         </div>
-                    ) : !loading && (
-                        <div className="text-center py-20 bg-white/40 backdrop-blur-sm rounded-[50px] border-4 border-dashed border-[#E6F4F5]">
-                            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 text-[#F07A4A] shadow-md">
-                                <FiUsers size={50} />
-                            </div>
-                            <p className="text-[#1E3A5F] text-2xl font-black">Ready to start?</p>
-                            <p className="text-[#3AA4AC] font-bold mt-2">Pick a class and section to see your magical learners! 🌈</p>
+                    ) : filters.className && filters.section && !loading && (
+                        <div className="bg-red-50 p-6 rounded-3xl border border-red-100 flex items-start gap-4">
+                        <FiAlertTriangle className="text-[#F07A4A] shrink-0 mt-1" size={20} />
+                        <div>
+                            <p className="text-sm text-red-500/80 leading-relaxed font-medium">
+                              Please select your assigned class and section to proceed.
+                            </p>
                         </div>
+                      </div>
                     )}
                 </div>
             </div>
