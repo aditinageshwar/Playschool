@@ -237,7 +237,12 @@ const FinanceAdminDashboard = () => {
               <span className="text-[#3AA4AC] font-bold tracking-[0.2em] uppercase text-xs">Accounts Center</span>
               <h1 className="text-3xl font-black text-[#1E3A5F] mt-1">Finance <span className="text-[#F07A4A]">Tracker</span></h1>
             </div>
-            <button onClick={() => setShowModal(true)} className="flex items-center gap-2 px-6 py-3 bg-[#F07A4A] text-white rounded-2xl font-bold shadow-lg shadow-orange-200 hover:scale-105 transition-all">
+            <button onClick={() => {
+              setEditingId(null);
+              setFormData({ studentId: '', amount: '', dueDate: '', status: 'Pending' });
+              setShowModal(true);
+              }} 
+              className="flex items-center gap-2 px-6 py-3 bg-[#F07A4A] text-white rounded-2xl font-bold shadow-lg shadow-orange-200 hover:scale-105 transition-all">
               <FiDollarSign size={20}/> Create New Fee
             </button>
           </div>
@@ -319,9 +324,24 @@ const FinanceAdminDashboard = () => {
                          </td>
                          <td className="p-6">
                            <div className="flex justify-center gap-2">
-                             <button onClick={() => generateInvoice(tx)} disabled={tx.status !== 'Paid'} className="p-2 bg-slate-50 text-[#3AA4AC] rounded-xl hover:bg-[#3AA4AC] hover:text-white disabled:opacity-30 transition-all"><FiFileText/></button>
-                             <button onClick={() => handleEditClick(tx)} className="p-2 bg-slate-50 text-blue-500 rounded-xl hover:bg-blue-500 hover:text-white transition-all"><FiEdit3/></button>
-                             <button onClick={() => handleDeleteFee(tx._id)} className="p-2 bg-slate-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all"><FiTrash2/></button>
+                            {tx.status === 'Paid' ? (
+                              <button onClick={() => generateInvoice(tx)} 
+                                className="flex item-center gap-2 p-2 bg-slate-50 text-[#3AA4AC] rounded-xl hover:bg-[#3AA4AC] hover:text-white transition-all">
+                                  <FiFileText/>
+                                  <span className='text-sm'>Receipt</span>
+                              </button>
+                            ) : ( 
+                            <> 
+                              <button onClick={() => handleEditClick(tx)} 
+                                className="p-2 bg-slate-50 text-blue-500 rounded-xl hover:bg-blue-500 hover:text-white transition-all">
+                                  <FiEdit3/>
+                              </button>
+                              <button onClick={() => handleDeleteFee(tx._id)} 
+                                className="p-2 bg-slate-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all">
+                                  <FiTrash2/>
+                              </button>
+                            </>
+                            )}
                            </div>
                          </td>
                        </tr>
@@ -346,22 +366,26 @@ const FinanceAdminDashboard = () => {
                   <FiX size={24} />
                 </button>
               </div>
-              
-              {editingId && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Status</label>
-                <select className="w-full p-2 border rounded-lg bg-gray-50 mb-4"
-                  value={formData.status}
-                  onChange={(e) => setFormData({...formData, status: e.target.value})}
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="Paid">Paid</option>
-                  <option value="Overdue">Overdue</option>
-                </select>
-              </div>
-              )}
 
               <form onSubmit={handleCreateFee} className="space-y-5">
+              {editingId ? (
+              <div className="p-4 bg-[#F8FAFC] rounded-xl border border-slate-200 mb-2">
+                <p className="text-[10px] font-black text-[#3AA4AC] uppercase tracking-[0.2em] mb-1">Editing Fee For</p>
+                <h4 className="font-bold text-[#1E3A5F]">
+                  {transactions.find(t => t._id === editingId)?.studentId?.user?.name}
+                </h4>
+                <p className="text-xs text-slate-400 font-medium">
+                  Class: {transactions.find(t => t._id === editingId)?.studentId?.className}
+                </p>
+                <p className="text-xs text-slate-400 font-medium">
+                  Section: {transactions.find(t => t._id === editingId)?.studentId?.section}
+                </p>
+                <p className="text-xs text-slate-400 font-medium">
+                  Roll No: {transactions.find(t => t._id === editingId)?.studentId?.rollNumber}
+                </p>
+              </div>
+              ) : (
+              <>  
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase">Class</label>
@@ -406,7 +430,9 @@ const FinanceAdminDashboard = () => {
                   Showing {filteredStudents.length} students in this category.
                 </p>
               </div>
-
+              </>
+              )}
+  
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Amount (₹)</label>
@@ -431,7 +457,7 @@ const FinanceAdminDashboard = () => {
                 <div className="flex gap-3 pt-4">
                   <button 
                     type="button" 
-                    onClick={() => setShowModal(false)}
+                    onClick={() => { setShowModal(false); setEditingId(null); setFormData({ studentId: '', amount: '', dueDate: '', status: 'Pending' });}}
                     className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-all"
                   >
                     Cancel
@@ -442,7 +468,7 @@ const FinanceAdminDashboard = () => {
                   >
                     {editingId ? "Update Record" : "Generate Fee"}
                   </button>
-                </div>
+                </div> 
               </form>
             </div>
           </div>

@@ -23,7 +23,7 @@ exports.getAllFees = async (req, res) => {
     const fees = await Fee.find()
       .populate({
         path: "studentId", 
-        select: "rollNumber", 
+        select: "className section rollNumber", 
         populate: {
           path: "user", 
           select: "name phone email"
