@@ -30,30 +30,35 @@ exports.getDashboardStats = async (req, res) => {
       classTeacher: teacher._id,
       status: "active" 
     });
-    const classPairs = assignedClasses.map(c => ({
-        className: c.className,
-        section: c.section
-    }));
-    const studentsInClass = await Student.find({
-      $or: classPairs
-    }).select('_id');
-    const studentIds = studentsInClass.map(s => s._id);
-
-    const attendanceRecords = await Attendance.find({
-      student: { $in: studentIds },
-      date: { $gte: start, $lte: end }
-    });
-
-    const presentRecords = attendanceRecords.filter(r => r.status === "Present").length;
-    const totalRecords = attendanceRecords.length;
-
     let attendancePercentage = "0%";
-    if (totalRecords > 0) {
-      const percentage = (presentRecords / totalRecords) * 100;
-      attendancePercentage = `${Math.round(percentage)}%`;
-    } else {
-      attendancePercentage = "N/A"; 
-    }
+    let presentRecords = 0;
+    let totalRecords = 0;
+
+    if (assignedClasses.length > 0) {
+      const classPairs = assignedClasses.map(c => ({
+          className: c.className,
+          section: c.section
+      }));
+      const studentsInClass = await Student.find({
+        $or: classPairs
+      }).select('_id');
+      const studentIds = studentsInClass.map(s => s._id);
+
+      if (studentIds.length > 0) {
+        const attendanceRecords = await Attendance.find({
+          student: { $in: studentIds },
+          date: { $gte: start, $lte: end }
+        });
+
+        const presentRecords = attendanceRecords.filter(r => r.status === "Present").length;
+        const totalRecords = attendanceRecords.length;
+
+        if (totalRecords > 0) {
+          const percentage = (presentRecords / totalRecords) * 100;
+          attendancePercentage = `${Math.round(percentage)}%`;
+        } 
+      }
+    } 
 
     //fourth stats
     const applications = await Application.find({ status: "Pending" })
