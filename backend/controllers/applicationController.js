@@ -70,7 +70,6 @@ exports.updateStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status, teacherRemarks } = req.body;
-    console.log(id, " ", status, " ", teacherRemarks);
     const updated = await Application.findByIdAndUpdate(id,
       { status, teacherRemarks },
       { new: true }

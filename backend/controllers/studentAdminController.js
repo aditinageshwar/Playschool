@@ -3,8 +3,7 @@ const Student = require("../models/Student");
 const Application = require("../models/Application");
 const bcrypt = require("bcryptjs");
 
-// ==================== ADMISSIONS MANAGEMENT ====================
-// Get all pending admissions (application requests)
+// ==================== APPLICATIONS MANAGEMENT ====================
 exports.getPendingAdmissions = async (req, res) => {
   try {
     const admissions = await Application.find({ status: "Pending" })
@@ -15,12 +14,12 @@ exports.getPendingAdmissions = async (req, res) => {
       .sort({ appliedDate: -1 });
 
     res.status(200).json({
-      message: "Pending admissions retrieved successfully",
+      message: "Pending applications retrieved successfully",
       data: admissions,
       count: admissions.length,
     });
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving admissions", error: error.message });
+    res.status(500).json({ message: "Error retrieving applications", error: error.message });
   }
 };
 
@@ -48,34 +47,20 @@ exports.getAllAdmissions = async (req, res) => {
 exports.approveAdmission = async (req, res) => {
   try {
     const { admissionId } = req.params;
-    const { className, section } = req.body;
-
-    // Find the application
     const application = await Application.findById(admissionId);
     if (!application) {
-      return res.status(404).json({ message: "Admission not found" });
+      return res.status(404).json({ message: "Application not found" });
     }
 
-    // Update application status
     application.status = "Approved";
-    application.approvedAt = new Date();
     await application.save();
 
-    // Update student record with class allocation
-    let student = await Student.findById(application.student);
-    if (student) {
-      student.className = className || student.className;
-      student.section = section || student.section;
-      student.allocationDate = new Date();
-      await student.save();
-    }
-
     res.status(200).json({
-      message: "Admission approved successfully",
-      data: { application, student },
+      message: "Application approved successfully",
+      data: application,
     });
   } catch (error) {
-    res.status(500).json({ message: "Error approving admission", error: error.message });
+    res.status(500).json({ message: "Error approving application", error: error.message });
   }
 };
 
@@ -83,24 +68,20 @@ exports.approveAdmission = async (req, res) => {
 exports.rejectAdmission = async (req, res) => {
   try {
     const { admissionId } = req.params;
-    const { reason } = req.body;
-
     const application = await Application.findById(admissionId);
     if (!application) {
-      return res.status(404).json({ message: "Admission not found" });
+      return res.status(404).json({ message: "Application not found" });
     }
 
     application.status = "Rejected";
-    application.rejectionReason = reason || "No reason provided";
-    application.rejectedAt = new Date();
     await application.save();
 
     res.status(200).json({
-      message: "Admission rejected successfully",
+      message: "Application rejected successfully",
       data: application,
     });
   } catch (error) {
-    res.status(500).json({ message: "Error rejecting admission", error: error.message });
+    res.status(500).json({ message: "Error rejecting application", error: error.message });
   }
 };
 

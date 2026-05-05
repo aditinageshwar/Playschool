@@ -125,7 +125,7 @@ const StudentAdminDashboard = () => {
 
   const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: <FiGrid /> },
-  { id: 'admissions', label: 'Admissions', icon: <FiFileText /> },
+  { id: 'applications', label: 'Applications', icon: <FiFileText /> },
   { id: 'profiles', label: 'Student Profiles', icon: <FiUsers /> },
   { id: 'allocation', label: 'Class Allocation', icon: <FiLayers /> },
   { id: 'promotions', label: 'Promotions', icon: <FiTrendingUp /> }
@@ -140,7 +140,7 @@ const StudentAdminDashboard = () => {
 
   const renderContent = () => {
     switch(activeTab) {
-      case 'admissions':
+      case 'applications':
         return <Admissions />;
       case 'profiles':
         return <StudentProfiles />;
