@@ -26,19 +26,21 @@ exports.getDashboardStats = async (req, res) => {
     const end = new Date();
     end.setHours(23, 59, 59, 999);
 
+    let attendancePercentage = "0%";
+    let presentRecords = 0;
+    let pendingCount = 0;
+
     const assignedClasses = await Class.find({ 
       classTeacher: teacher._id,
       status: "active" 
     });
-    let attendancePercentage = "0%";
-    let presentRecords = 0;
-    let totalRecords = 0;
-
+    
     if (assignedClasses.length > 0) {
       const classPairs = assignedClasses.map(c => ({
-          className: c.className,
-          section: c.section
+        className: c.className,
+        section: c.section
       }));
+
       const studentsInClass = await Student.find({
         $or: classPairs
       }).select('_id');
@@ -50,24 +52,24 @@ exports.getDashboardStats = async (req, res) => {
           date: { $gte: start, $lte: end }
         });
 
-        const presentRecords = attendanceRecords.filter(r => r.status === "Present").length;
+        presentRecords = attendanceRecords.filter(r => r.status === "Present").length;
         const totalRecords = attendanceRecords.length;
 
         if (totalRecords > 0) {
           const percentage = (presentRecords / totalRecords) * 100;
           attendancePercentage = `${Math.round(percentage)}%`;
         } 
-      }
-    } 
 
-    //fourth stats
-    const applications = await Application.find({ status: "Pending" })
-      .populate({
-        path: 'student',
-        match: { $or: classPairs }, 
-        select: '_id'
-      });
-    const pendingCount = applications.filter(app => app.student !== null).length;
+        //fourth stats
+        const applications = await Application.find({ status: "Pending" })
+          .populate({
+            path: 'student',
+            match: { $or: classPairs }, 
+            select: '_id'
+          });
+        pendingCount = applications.filter(app => app.student !== null).length;
+      }
+    }
 
     res.status(200).json({
         classesToday: classCount,
