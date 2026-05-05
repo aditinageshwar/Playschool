@@ -12,12 +12,14 @@ const TeacherAssignments = () => {
     const [fetching, setFetching] = useState(true);
     const [viewSubModal, setViewSubModal] = useState(false);
     const [currentSubmissions, setCurrentSubmissions] = useState([]);
+    const [allottedClasses, setAllottedClasses] = useState([]);
     
     const [form, setForm] = useState({title: "", className: "", section: "", dueDate: "", instructions: ""});
     const today = new Date().toISOString().split('T')[0];
 
     useEffect(() => {
         fetchAssignments();
+        fetchAllottedClasses();
     }, []);
 
     const fetchAssignments = async () => {
@@ -30,6 +32,24 @@ const TeacherAssignments = () => {
             console.error("Error fetching assignments:", err);
         } finally {
             setFetching(false);
+        }
+    };
+
+    const fetchAllottedClasses = async () => {
+        try {
+            const userEmail = localStorage.getItem('userEmail');
+            const res = await API.get(`/api/assignment/my-classes?email=${userEmail}`);
+            setAllottedClasses(res.data); 
+            
+            if(res.data.length > 0) {
+                setForm(prev => ({
+                    ...prev,
+                    className: res.data[0].className,
+                    section: res.data[0].section
+                }));
+            }
+        } catch (err) {
+            console.error("Error fetching classes:", err);
         }
     };
 
@@ -183,14 +203,29 @@ const TeacherAssignments = () => {
                                 </div>
 
                                 <form onSubmit={handleSubmit} className="space-y-6">
-                                    <input name="title" required value={form.title} placeholder="Magical Task Title" onChange={handleChange} 
+                                    <input name="title" required value={form.title} placeholder="Task Title" onChange={handleChange} 
                                         className="w-full p-3 bg-[#F8FAFC] border border-slate-300 rounded-[15px] focus:ring-4 ring-[#3AA4AC]/10 font-semibold outline-none" />
-                                    
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <input name="className" required value={form.className} placeholder="Class (e.g. Nursery)" onChange={handleChange} 
-                                            className="w-full p-3 bg-[#F8FAFC] border border-slate-300 rounded-[15px] focus:ring-4 ring-[#3AA4AC]/10 font-semibold outline-none" />
-                                        <input name="section" required value={form.section} placeholder="Section (e.g. A)" onChange={handleChange} 
-                                            className="w-full p-3 bg-[#F8FAFC] border border-slate-300 rounded-[15px] focus:ring-4 ring-[#3AA4AC]/10 font-semibold outline-none" />
+
+                                    <div className="space-y-4">
+                                        <select 
+                                            name="classSelection"
+                                            required 
+                                            className="w-full p-3 bg-[#F8FAFC] border border-slate-300 rounded-[15px] focus:ring-4 ring-[#3AA4AC]/10 font-semibold outline-none"
+                                            onChange={(e) => {
+                                                const selected = allottedClasses[e.target.value];
+                                                setForm({ ...form, className: selected.className, section: selected.section });
+                                            }}
+                                        >
+                                            {allottedClasses.length === 0 ? (
+                                                <option>No classes assigned to you</option>
+                                            ) : (
+                                                allottedClasses.map((cls, index) => (
+                                                    <option key={index} value={index}>
+                                                        {cls.className} - {cls.section}
+                                                    </option>
+                                                ))
+                                            )}
+                                        </select>
                                     </div>
 
                                     <div className="relative">

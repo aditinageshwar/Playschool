@@ -8,6 +8,7 @@ const assignmentController = require("../controllers/assignmentController");
 
 router.post("/create", auth, role("teacher"), assignmentController.createAssignment);
 router.get("/all", auth, role(["teacher", "student"]), assignmentController.getAssignments);
+router.get("/my-classes", auth, role("teacher"), assignmentController.getMyClasses);
 router.get("/submit", auth, role("teacher"), assignmentController.getAssignmentSubmissions);
 router.post("/submit", auth, role("student"), assignmentController.submitAssignment);
 router.get("/my-submissions", auth, role("student"), assignmentController.getMySubmissions);

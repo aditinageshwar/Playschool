@@ -3,6 +3,29 @@ const User = require("../models/User");
 const Teacher = require("../models/Teacher");
 const Student = require("../models/Student");
 const Submission = require("../models/Submission");
+const Class = require("../models/Class");
+
+exports.getMyClasses = async (req, res) => {
+    try {
+      const { email } = req.query; 
+      const user = await User.findOne({ email });
+      const teacher = await Teacher.findOne({ user: user._id });
+      if (!teacher) {
+        return res.status(404).json({ message: "Teacher profile not found" });
+      }
+
+      const assignedClasses = await Class.find({ 
+        classTeacher: teacher._id,
+        status: "active" 
+      }).select('className section -_id'); 
+
+      res.status(200).json(assignedClasses);
+    } 
+    catch (error) {
+      console.error("Error fetching teacher classes:", error);
+      res.status(500).json({ message: "Server error while fetching classes" });
+    }
+};
 
 exports.createAssignment = async (req, res) => {
    try {
@@ -10,7 +33,12 @@ exports.createAssignment = async (req, res) => {
         const user = await User.findOne({ email: userEmail });
         const teacher = await Teacher.findOne({ user: user._id });
         if (!teacher) return res.status(404).json({ message: "Teacher not found" });
-        
+         
+        const isAuthorized = await Class.findOne({ className, section, classTeacher: teacher._id});
+        if (!isAuthorized) {
+          return res.status(403).json({ message: "You are not authorized to create assignments for this class." });
+        }
+
         const newAssignment = new Assignment({
             teacher: teacher._id,
             className,
